@@ -135,10 +135,8 @@
     (if disconnect
       (send-to-worker this worker W_DISCONNECT nil nil))
     (if (realized? (:service worker))
-      (dosync
-        (commute (get-in worker [:service :waiting]) disj worker)))
-    (dosync
-      (commute workers dissoc worker))
+      (swap! (:waiting @(:service worker)) disj worker))
+    (swap! workers dissoc worker)
     (.destroy (.address worker)))
   
   (require-worker [this address]
@@ -149,8 +147,7 @@
       (if-let [^Worker worker (get @workers id)]
         worker
         (let [n_worker (create-worker id (.duplicate address))]
-          (dosync
-            (commute workers assoc id n_worker))
+          (swap! workers assoc id n_worker)
           (if verbose
             (info "I: registering new worker:" id))
           n_worker))))
@@ -163,8 +160,7 @@
       (if-let [^Service service (get @services id)]
         service
         (let [n_service (create-service id)]
-          (dosync
-            (commute services assoc id n_service))
+          (swap! services assoc id n_service)
           n_service))))
   
   (bind [this endpoint]
@@ -255,7 +251,7 @@
 (defn create-broker [verbose]
   (let [^ZMQ$Context ctx (ZMQ/context 1)
         ^ZMQ$Socket socket (.socket ctx ZMQ/ROUTER)]
-    (->Broker ctx socket (atom 0) (ref {}) (ref {}) (ref []) verbose)))
+    (->Broker ctx socket (atom 0) (atom {}) (atom {}) (ref []) verbose)))
 
 
 
