@@ -17,12 +17,12 @@
     (worker/destroy worker_session)))
 
 (defn client-life []
-  (let [client_session (client/create-client "tcp://localhost:5555" false)]
-    (dotimes [i 100000]
+  (let [client_session (client/create-client "tcp://localhost:5555" true)]
+    (dotimes [i 100]
       (let [^ZMsg request (ZMsg. )]
         (.addString request (format "Hellou %d" i))
         (client/send-request client_session "echo" request)))
-    (dotimes [i 100000]
+    (dotimes [i 100]
       (let [^ZMsg reply (client/recv client_session)]
         (if-not (nil? reply)
           (comment

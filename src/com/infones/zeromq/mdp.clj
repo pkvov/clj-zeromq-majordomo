@@ -3,25 +3,33 @@
            ZFrame
            ZMQ]))
 
-(defprotocol MajorDomoProtocol
-  (new-frame [this])
-  (frame-equals [this ^ZFrame frame]))
+(defrecord MajorDomo [data])
 
-(defrecord MajorDomo [data]
+(defprotocol MajorDomoProtocol
+  (new-frame [^MajorDomo this])
+  (frame-equals [^MajorDomo this ^ZFrame frame]))
+
+(def majordomo-protocol-impl
+  {
+   :new-frame (fn [^MajorDomo this]
+                (ZFrame. (:data this)))
+   
+   :frame-equals (fn [^MajorDomo this ^ZFrame frame]
+                   (java.util.Arrays/equals (:data this) (.getData frame)))
+   })
+
+(extend MajorDomo
   MajorDomoProtocol
-  (new-frame [this]
-    (ZFrame. data))
-  (frame-equals [this frame]
-    (java.util.Arrays/equals data (.getData frame))))
+  majordomo-protocol-impl)
 
 (defmulti ^:private ->MajorDomo
   (fn [data]
     (class data)))
 
-(defmethod ^:private ->MajorDomo java.lang.String [data]
+(defmethod ^:private ->MajorDomo java.lang.String [^String data]
   (MajorDomo. (.getBytes data ZMQ/CHARSET)))
 
-(defmethod ^:private ->MajorDomo java.lang.Long [data]
+(defmethod ^:private ->MajorDomo java.lang.Long [^Long data]
   (MajorDomo. (into-array Byte/TYPE [data])))
 
 (def C_CLIENT (->MajorDomo "MDPC01"))
