@@ -58,7 +58,7 @@
                   (.send request (:client this)))
   
   :destroy (fn [^Client this]
-             #_(.close ctx))})
+             (.term (:ctx this)))})
 
 (extend Client
   MajorDomoClient

@@ -119,7 +119,7 @@
                  nil)))
   
   :destroy (fn [^Worker this]
-             #_(.terminate (:ctx this)))
+             (.term (:ctx this)))
   })
 
 (extend Worker

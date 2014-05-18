@@ -84,7 +84,7 @@
   :destroy (fn [^Broker this]
              (doseq [^Worker worker (vals @(:workers this))]
                (delete-worker this worker true))
-             #_(.destroy ctx))
+             (.term ctx))
   
   :process-client (fn [^Broker this ^ZFrame sender ^ZMsg msg]
                     (assert (> (.size msg) 1))
