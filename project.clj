@@ -1,4 +1,4 @@
-(defproject clj-zeromq-majordomo "0.1.1"
+(defproject clj-zeromq-majordomo "0.1.2"
   :description "Clojure implementation of Majordomo pattern"
   :url "https://github.com/selmeci/clj-zeromq-majordomo"
   :dependencies [[org.clojure/clojure "1.5.1"]
